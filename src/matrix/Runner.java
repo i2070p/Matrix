@@ -9,6 +9,11 @@ public class Runner {
 
     public static void main(String[] args) {
         Matrix A = new Matrix();
+        Matrix B = new Matrix();
+        
+        Matrix C = A.mul(B);
+        
+        
     }
 
 }
