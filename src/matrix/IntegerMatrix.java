@@ -5,51 +5,68 @@
  */
 package matrix;
 
-import matrix.element.MatrixElement;
+import matrix.interfaces.MatrixInterface;
 import java.lang.reflect.Array;
-import matrix.element.IntegerElement;
 import matrix.exception.MatrixException;
 
 /**
  *
  * @author i2070p
  */
-public class Matrix implements MatrixInterface {
+public class IntegerMatrix implements MatrixInterface<Integer> {
 
-    private final MatrixElement[][] matrix;
+    private final Integer[][] matrix;
     private final int height;
     private final int width;
 
-    public Matrix(int height, int width) {
+    public IntegerMatrix(int height, int width) {
         this.height = height;
         this.width = width;
-        this.matrix = (MatrixElement[][]) Array.newInstance(MatrixElement.class, this.height, this.width);
+        this.matrix = (Integer[][]) Array.newInstance(Integer.class, this.height, this.width);
     }
 
-    public Matrix(Matrix matrix) {
-        this(matrix.height, matrix.width);
+    public IntegerMatrix(Integer[] matrix, int width) {
+        this(matrix.length / width, width);
+
+        for (int i = 0; i < matrix.length; i++) {
+            int column = i % width;
+            int row = i / width;
+
+            this.matrix[row][column] = matrix[i].intValue();
+        }
+
+    }
+
+    public IntegerMatrix(Integer[][] matrix) {
+        this(matrix.length, matrix[0].length);
 
         for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.height; j++) {
-                this.matrix[i][j].set(matrix.matrix[i][j]);
+            for (int j = 0; j < this.width; j++) {
+                this.matrix[i][j] = matrix[i][j].intValue();
             }
         }
+
+    }
+
+    public IntegerMatrix(IntegerMatrix matrix) {
+        this(matrix.matrix);
     }
 
     @Override
     public MatrixInterface mul(MatrixInterface matrix) throws MatrixException {
-
-        if (this.getHeight() != matrix.getWidth()) {
+        if (this.getWidth() != matrix.getHeight()) {
             throw new MatrixException("Wrong size.");
         }
 
-        MatrixInterface result = new Matrix(this.getHeight(), matrix.getWidth());
+        MatrixInterface result = new IntegerMatrix(this.getHeight(), matrix.getWidth());
 
         for (int i = 0; i < this.getHeight(); i++) {
             for (int j = 0; j < matrix.getWidth(); j++) {
-                MatrixElement sum = new IntegerElement(0);
+
+                Integer sum = 0;
+
                 for (int k = 0; k < this.getWidth(); k++) {
-                    sum.add(this.getValue(i, k).mul(matrix.getValue(k, j)));
+                    sum += this.getValue(i, k).intValue() * matrix.getValue(k, j).intValue();
                 }
                 result.setValue(i, j, sum);
             }
@@ -59,31 +76,34 @@ public class Matrix implements MatrixInterface {
     }
 
     @Override
-    public MatrixInterface setValue(int row, int column, MatrixElement value) throws MatrixException {
+    public MatrixInterface setValue(int row, int column, Integer value) throws MatrixException {
         if (!(row < this.height && row >= 0 && column < this.width && column >= 0)) {
             throw new MatrixException("Index out of bounds");
         }
 
-        this.matrix[row][column].set(value);
+        this.matrix[row][column] = value.intValue();
+
         return this;
     }
 
     @Override
-    public MatrixInterface setValues(MatrixElement value) {
+    public MatrixInterface setValues(Integer value) {
         for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.height; j++) {
-                this.matrix[i][j].set(value);
+            for (int j = 0; j < this.width; j++) {
+                this.matrix[i][j] = value.intValue();
             }
         }
+
         return this;
     }
 
     @Override
-    public MatrixElement getValue(int row, int column) throws MatrixException {
+    public Integer getValue(int row, int column) throws MatrixException {
         if (!(row < this.height && row >= 0 && column < this.width && column >= 0)) {
             throw new MatrixException("Index out of bounds");
         }
-        return this.matrix[row][column];
+
+        return this.matrix[row][column].intValue();
     }
 
     @Override
@@ -99,16 +119,16 @@ public class Matrix implements MatrixInterface {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("Size: ").append(this.height).append(" x ").append(this.width).append("\n");
+
         for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.height; j++) {
+            for (int j = 0; j < this.width; j++) {
                 result.append(this.matrix[i][j]).append(" ");
             }
 
             result.append("\n");
         }
 
-        return result.toString();
+        return  result.append("Size: ").append(this.height).append(" x ").append(this.width).append("\n").toString();
     }
 
     @Override
@@ -117,22 +137,22 @@ public class Matrix implements MatrixInterface {
     }
 
     @Override
-    public MatrixInterface add(MatrixElement value) {
+    public MatrixInterface add(Integer value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public MatrixInterface sub(MatrixElement value) {
+    public MatrixInterface sub(Integer value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public MatrixInterface mul(MatrixElement value) {
+    public MatrixInterface mul(Integer value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public MatrixInterface div(MatrixElement value) {
+    public MatrixInterface div(Integer value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -157,7 +177,7 @@ public class Matrix implements MatrixInterface {
     }
 
     @Override
-    public MatrixElement getDeterminant() throws MatrixException {
+    public Integer getDeterminant() throws MatrixException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
